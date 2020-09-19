@@ -15,21 +15,21 @@ def custom_tile_image_plot(
     filename="",
     cmap="gray",
     label_size=16,
-    label_colours=None,
+    label_color=None,
     figure_size=(8., 8.),
 ):
     """
     Plots multiple images as subplots.
     
     Args:
-        layout (tuple):       Tuple of integers (m,n).
-        images (np.array):    NumPy array containing the images.
-        labels (np.array):    A list or NumPy array of labels (optional)
-        filename (str):       Filename to save the plot to as png (optional).
-        cmap (str):           Color map name (default is "gray"). 
-        label_size (int):     Font size of the labels.
-        label_colours (list): A list containing the color for each label. 
-        figure_size (tuple):  Figure size
+        layout (tuple): Tuple of integers (m,n).
+        images (np.array): NumPy array containing the images.
+        labels (np.array): A list or NumPy array of labels (optional)
+        filename (str): Filename to save the plot to as png (optional).
+        cmap (str): Color map name (default is "gray"). 
+        label_size (int): Font size of the labels.
+        label_color (str or list): Label color(s). 
+        figure_size (tuple): Figure size
     
     Returns:
         None
@@ -63,7 +63,28 @@ def custom_tile_image_plot(
             axes_dict[(r,c)].get_yaxis().set_visible(False)  ## Hide y axis
             #
             if( labels is not None ):
-                if( label_colours is None ):
+                if(isinstance(label_color, str)):
+                    plt.text(0.1, 0.1, str(labels[index]), 
+                        horizontalalignment="center",
+                        verticalalignment="center", 
+                        transform=axes_dict[(r,c)].transAxes,
+                        rotation=0.,
+                        rotation_mode="anchor",
+                        color=label_color,
+                        alpha=.85,
+                        fontsize=label_size)
+                elif(isinstance(label_color, list)):
+                    plt.text(0.1, 0.1, str(labels[index]), 
+                        horizontalalignment="center",
+                        verticalalignment="center", 
+                        transform=axes_dict[(r,c)].transAxes,
+                        rotation=0.,
+                        rotation_mode="anchor",
+                        color=label_color[(r*layout[1]+c)],
+                        alpha=.75,
+                        fontsize=label_size)
+                else:
+                    print(f"WARNING: \"label_color\" is neither a str nor a list...")
                     plt.text(0.1, 0.1, str(labels[index]), 
                         horizontalalignment="center",
                         verticalalignment="center", 
@@ -72,16 +93,6 @@ def custom_tile_image_plot(
                         rotation_mode="anchor",
                         color="green",
                         alpha=.85,
-                        fontsize=label_size)
-                else:
-                    plt.text(0.1, 0.1, str(labels[index]), 
-                        horizontalalignment="center",
-                        verticalalignment="center", 
-                        transform=axes_dict[(r,c)].transAxes,
-                        rotation=0.,
-                        rotation_mode="anchor",
-                        color=label_colours[(r*layout[1]+c)],
-                        alpha=.75,
                         fontsize=label_size)
             #
             axes_dict[(r,c)].imshow( images[(r*layout[1]+c),:], origin="upper", cmap=cmap)
@@ -107,15 +118,15 @@ def custom_tile_plot_with_inference_hists(
     Show multiple images AND their class probabilities as subplots.
     
     Args:
-        layout (tuple):           Tuple of integers (m,n).
-        data (np.array):          NumPy array containing the images.
-        labels (np.array):        A list or NumPy array of labels.
-        predictions (np.array):   Contains the inference class probabilities.
-        classes (np.array):       NumPy array of classes (optional -- default is [0..10])
+        layout (tuple): Tuple of integers (m,n).
+        data (np.array): NumPy array containing the images.
+        labels (np.array): A list or NumPy array of labels.
+        predictions (np.array): Contains the inference class probabilities.
+        classes (np.array): NumPy array of classes (optional -- default is [0..10])
         only_mispredicted (bool): If True, will skip correctly predicted ones.
-        filename (str):           Filename to save the plot to as png (optional).
-        cmap (str):               Color map name (default is "gray"). 
-        label_size (int):         Font size of the labels.
+        filename (str): Filename to save the plot to as PNG (optional).
+        cmap (str): Color map name (default is "gray"). 
+        label_size (int): Font size of the labels.
     
     Returns:
         None
