@@ -40,9 +40,23 @@ class ScrambledImageDataGenerator(tf.keras.utils.Sequence):
         # Features
         features = np.copy(self.features[self.batch_size*idx:self.batch_size*(idx+1),:])
         if(self.scrambler is not None):
-            for n in range(self.batch_size):
-                features[n,:,:] = features[n,:,:].flatten()[self.scrambler].reshape(
-                    self.features.shape[1:])
+            if(len(features.shape) == 3):  # grayscale image:
+                for n in range(self.batch_size):
+                    flatten_array = features[n, :, :].flatten()[self.scrambler]
+                    features[n, :, :] = flatten_array.reshape(self.features.shape[1:])
+            elif(features.shape[-1] == 3):
+                for n in range(self.batch_size):
+                    flatten_array = features[n, :, :, 0].flatten()[self.scrambler]
+                    features[n, :, :, 0] = flatten_array.reshape(self.features.shape[1:-1])
+                    #
+                    flatten_array = features[n, :, :, 1].flatten()[self.scrambler]
+                    features[n, :, :, 1] = flatten_array.reshape(self.features.shape[1:-1])
+                    #
+                    flatten_array = features[n, :, :, 2].flatten()[self.scrambler]
+                    features[n, :, :, 2] = flatten_array.reshape(self.features.shape[1:-1])
+            else:
+                raise ValueError(f"Features are neither 2D grayscale images nor 3D  RGB images!\
+                    \n{features.shape}")
         # Labels
         labels = self.labels[self.batch_size*idx:self.batch_size*(idx+1)]
         return (features, labels)
