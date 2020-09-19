@@ -95,7 +95,15 @@ def custom_tile_image_plot(
                         alpha=.85,
                         fontsize=label_size)
             #
-            axes_dict[(r,c)].imshow( images[(r*layout[1]+c),:], origin="upper", cmap=cmap)
+            image = images[(r*layout[1]+c),:]
+            if(len(image.shape) == 2):
+                axes_dict[(r,c)].imshow(image, origin="upper", cmap=cmap)
+            elif(image.shape[-1] == 3):
+                axes_dict[(r,c)].imshow(image, origin="upper")
+            else:
+                raise ValueError(
+                    f"Expected either a grayscale (2D) or RGB image!\n{image.shape}")
+
     #
     if( filename!="" ):
         plt.savefig(filename, dpi=100, bbox_inches="tight")
