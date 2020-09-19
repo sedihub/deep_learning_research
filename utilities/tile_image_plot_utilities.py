@@ -12,10 +12,11 @@ def custom_tile_image_plot(
     layout,
     images,
     labels=None,
-    filename='',
-    cmap='gray',
+    filename="",
+    cmap="gray",
     label_size=16,
-    label_colours=None
+    label_colours=None,
+    figure_size=(8., 8.),
 ):
     """
     Plots multiple images as subplots.
@@ -25,9 +26,10 @@ def custom_tile_image_plot(
         images (np.array):    NumPy array containing the images.
         labels (np.array):    A list or NumPy array of labels (optional)
         filename (str):       Filename to save the plot to as png (optional).
-        cmap (str):           Color map name (default is 'gray'). 
+        cmap (str):           Color map name (default is "gray"). 
         label_size (int):     Font size of the labels.
         label_colours (list): A list containing the color for each label. 
+        figure_size (tuple):  Figure size
     
     Returns:
         None
@@ -40,12 +42,10 @@ def custom_tile_image_plot(
     #
     width  = (1.-left_margine)/(horizontal_spacing_fraction*(layout[0]-1)+layout[0])
     height = (1.-bottom_margin)/(vertical_spacing_fraction*(layout[1]-1)+layout[1])
-    #
-    ## Set figure size properly:
-    fig_width  = 8. ## inches
-    fig_height = 8. ## inches
-    plt.figure( figsize=(fig_width,fig_height) )
-    #
+
+    # Set figure size properly:
+    fig = plt.figure(figsize=figure_size)
+
     axes_dict = {}
     for r in range(0,layout[1]):
         for c in range(0,layout[0]):
@@ -56,7 +56,7 @@ def custom_tile_image_plot(
                            width, 
                            height ]
             axes_dict[(r,c)] = plt.axes(axis_coord)
-            axes_dict[(r,c)].set_aspect('equal')
+            axes_dict[(r,c)].set_aspect("equal")
             # axes_dict[(r,c)].get_xaxis().set_ticks([])  ## No x ticks
             # axes_dict[(r,c)].get_yaxis().set_ticks([])  ## No y ticks
             axes_dict[(r,c)].get_xaxis().set_visible(False)  ## Hide x axis
@@ -64,34 +64,30 @@ def custom_tile_image_plot(
             #
             if( labels is not None ):
                 if( label_colours is None ):
-                    plt.text( 0.1, 
-                              0.1, 
-                              str(labels[index]), 
-                              horizontalalignment='center',
-                              verticalalignment='center', 
-                              transform=axes_dict[(r,c)].transAxes,
-                              rotation=0.,
-                              rotation_mode='anchor',
-                              color='blue',
-                              alpha=.75,
-                              fontsize=label_size)
+                    plt.text(0.1, 0.1, str(labels[index]), 
+                        horizontalalignment="center",
+                        verticalalignment="center", 
+                        transform=axes_dict[(r,c)].transAxes,
+                        rotation=0.,
+                        rotation_mode="anchor",
+                        color="green",
+                        alpha=.85,
+                        fontsize=label_size)
                 else:
-                    plt.text( 0.1, 
-                              0.1, 
-                              str(labels[index]), 
-                              horizontalalignment='center',
-                              verticalalignment='center', 
-                              transform=axes_dict[(r,c)].transAxes,
-                              rotation=0.,
-                              rotation_mode='anchor',
-                              color=label_colours[(r*layout[1]+c)],
-                              alpha=.75,
-                              fontsize=label_size)
+                    plt.text(0.1, 0.1, str(labels[index]), 
+                        horizontalalignment="center",
+                        verticalalignment="center", 
+                        transform=axes_dict[(r,c)].transAxes,
+                        rotation=0.,
+                        rotation_mode="anchor",
+                        color=label_colours[(r*layout[1]+c)],
+                        alpha=.75,
+                        fontsize=label_size)
             #
-            axes_dict[(r,c)].imshow( images[(r*layout[1]+c),:], origin='upper', cmap=cmap)
+            axes_dict[(r,c)].imshow( images[(r*layout[1]+c),:], origin="upper", cmap=cmap)
     #
-    if( filename!='' ):
-        plt.savefig(filename, dpi=100, bbox_inches='tight')
+    if( filename!="" ):
+        plt.savefig(filename, dpi=100, bbox_inches="tight")
     else:
         plt.show()
     
@@ -103,8 +99,8 @@ def custom_tile_plot_with_inference_hists(
     predictions,
     classes=np.linspace(start=0,stop=10,num=10,endpoint=False,dtype=np.uint8),
     only_mispredicted=False,
-    filename='', 
-    cmap='gray', 
+    filename="", 
+    cmap="gray", 
     label_size=32
 ):
     """
@@ -118,7 +114,7 @@ def custom_tile_plot_with_inference_hists(
         classes (np.array):       NumPy array of classes (optional -- default is [0..10])
         only_mispredicted (bool): If True, will skip correctly predicted ones.
         filename (str):           Filename to save the plot to as png (optional).
-        cmap (str):               Color map name (default is 'gray'). 
+        cmap (str):               Color map name (default is "gray"). 
         label_size (int):         Font size of the labels.
     
     Returns:
@@ -217,10 +213,10 @@ def custom_tile_plot_with_inference_hists(
                                  image_width, 
                                  image_height ]
             image_axes_dict[(r,c)] = plt.axes(image_axis_coord)
-            image_axes_dict[(r,c)].set_aspect('equal')
+            image_axes_dict[(r,c)].set_aspect("equal")
             image_axes_dict[(r,c)].get_xaxis().set_visible(False)  ## Hide x axis
             image_axes_dict[(r,c)].get_yaxis().set_visible(False)  ## Hide y axis
-            image_axes_dict[(r,c)].imshow( images_[index,:], origin='upper', cmap=cmap)
+            image_axes_dict[(r,c)].imshow( images_[index,:], origin="upper", cmap=cmap)
             #
             ## Prediction
             bar_axis_coord = [ bar_left_delta   + cell_corner[0], 
@@ -228,28 +224,28 @@ def custom_tile_plot_with_inference_hists(
                                bar_width, 
                                bar_height ] 
             bar_axes_dict[(r,c)] = plt.axes(bar_axis_coord)
-            bar_axes_dict[(r,c)].set_aspect('auto') 
+            bar_axes_dict[(r,c)].set_aspect("auto") 
             if( horizontal_layout ):
                 bar_axes_dict[(r,c)].set_xticks(np.arange(0,1.1,step=.25))
-                bar_axes_dict[(r,c)].tick_params(axis='x', labelsize=6., labelrotation=90)
+                bar_axes_dict[(r,c)].tick_params(axis="x", labelsize=6., labelrotation=90)
                 bar_axes_dict[(r,c)].set_yticks(classes)
-                bar_axes_dict[(r,c)].tick_params(axis='y', labelsize=6., labelrotation=0)
+                bar_axes_dict[(r,c)].tick_params(axis="y", labelsize=6., labelrotation=0)
                 if( highest_prob_label == labels_[index] ):
-                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color='b')
+                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color="b")
                     bar_axes_dict[(r,c)].set_facecolor((.9, .9, 1.))
                 else:
-                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color='r')
+                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color="r")
                     bar_axes_dict[(r,c)].set_facecolor((1., .9, .9))
             else:
                 bar_axes_dict[(r,c)].set_yticks(np.arange(0,1.1,step=.25))
-                bar_axes_dict[(r,c)].tick_params(axis='y', labelsize=6., labelrotation=0)
+                bar_axes_dict[(r,c)].tick_params(axis="y", labelsize=6., labelrotation=0)
                 bar_axes_dict[(r,c)].set_xticks(classes)
-                bar_axes_dict[(r,c)].tick_params(axis='x', labelsize=6., labelrotation=90)
+                bar_axes_dict[(r,c)].tick_params(axis="x", labelsize=6., labelrotation=90)
                 if( highest_prob_label == labels_[index] ):
-                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color='b')
+                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color="b")
                     bar_axes_dict[(r,c)].set_facecolor((.9, .9, 1.))
                 else:
-                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color='r')
+                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color="r")
                     bar_axes_dict[(r,c)].set_facecolor((1., .9, .9))
             #
             if( c!=0 ):
@@ -257,15 +253,15 @@ def custom_tile_plot_with_inference_hists(
             if( r!=0 ):
                 bar_axes_dict[(r,c)].get_xaxis().set_visible(False)
             #
-            bar_axes_dict[(r,c)].text( .5, .5, str(labels_[index]),
-                                       transform=bar_axes_dict[(r,c)].transAxes,
-                                       verticalalignment='center', 
-                                       horizontalalignment='center',
-                                       color='black',
-                                       alpha=.5,
-                                       fontsize=label_size )
+            bar_axes_dict[(r,c)].text(.5, .5, str(labels_[index]),
+                transform=bar_axes_dict[(r,c)].transAxes,
+                verticalalignment="center", 
+                horizontalalignment="center",
+                color="black",
+                alpha=.5,
+                fontsize=label_size)
     #
-    if( filename!='' ):
-        plt.savefig(filename, dpi=100, bbox_inches='tight')
+    if( filename!="" ):
+        plt.savefig(filename, dpi=100, bbox_inches="tight")
     else:
         plt.show()
