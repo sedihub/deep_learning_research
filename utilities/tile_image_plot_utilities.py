@@ -254,10 +254,12 @@ def custom_tile_plot_with_inference_hists(
                 raise ValueError(
                     f"Expected either a grayscale (2D) or RGB image!\n{image.shape}")
             # Prediction
-            bar_axis_coord = [ bar_left_delta   + cell_corner[0], 
-                               bar_bottom_delta + cell_corner[1],  
-                               bar_width, 
-                               bar_height ] 
+            bar_axis_coord = [ 
+                bar_left_delta + cell_corner[0], 
+                bar_bottom_delta + cell_corner[1],  
+                bar_width,
+                bar_height
+            ] 
             bar_axes_dict[(r, c)] = plt.axes(bar_axis_coord)
             bar_axes_dict[(r, c)].set_aspect("auto") 
             if(horizontal_layout):

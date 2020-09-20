@@ -50,14 +50,9 @@ class ScrambledImageDataGenerator(tf.keras.utils.Sequence):
                     features[n, :, :, 0] = flatten_array.reshape(self.features.shape[1:-1])
             elif(features.shape[-1] == 3):
                 for n in range(self.batch_size):
-                    flatten_array = features[n, :, :, 0].flatten()[self.scrambler]
-                    features[n, :, :, 0] = flatten_array.reshape(self.features.shape[1:-1])
-                    #
-                    flatten_array = features[n, :, :, 1].flatten()[self.scrambler]
-                    features[n, :, :, 1] = flatten_array.reshape(self.features.shape[1:-1])
-                    #
-                    flatten_array = features[n, :, :, 2].flatten()[self.scrambler]
-                    features[n, :, :, 2] = flatten_array.reshape(self.features.shape[1:-1])
+                    for c in range(3):
+                        flatten_array = features[n, :, :, c].flatten()[self.scrambler]
+                        features[n, :, :, c] = flatten_array.reshape(self.features.shape[1:-1])
             else:
                 raise ValueError(f"Features are neither 2D grayscale images nor 3D  RGB images!\
                     \n{features.shape}")
