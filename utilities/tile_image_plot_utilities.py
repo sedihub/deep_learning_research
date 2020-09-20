@@ -55,19 +55,19 @@ def custom_tile_image_plot(
                            bottom_margin + r*(vertical_spacing_fraction   + 1.)*height,  
                            width, 
                            height ]
-            axes_dict[(r,c)] = plt.axes(axis_coord)
-            axes_dict[(r,c)].set_aspect("equal")
-            # axes_dict[(r,c)].get_xaxis().set_ticks([])  ## No x ticks
-            # axes_dict[(r,c)].get_yaxis().set_ticks([])  ## No y ticks
-            axes_dict[(r,c)].get_xaxis().set_visible(False)  ## Hide x axis
-            axes_dict[(r,c)].get_yaxis().set_visible(False)  ## Hide y axis
+            axes_dict[(r, c)] = plt.axes(axis_coord)
+            axes_dict[(r, c)].set_aspect("equal")
+            # axes_dict[(r, c)].get_xaxis().set_ticks([])  ## No x ticks
+            # axes_dict[(r, c)].get_yaxis().set_ticks([])  ## No y ticks
+            axes_dict[(r, c)].get_xaxis().set_visible(False)  ## Hide x axis
+            axes_dict[(r, c)].get_yaxis().set_visible(False)  ## Hide y axis
             #
-            if( labels is not None ):
+            if(labels is not None):
                 if(isinstance(label_color, str)):
                     plt.text(0.1, 0.1, str(labels[index]), 
                         horizontalalignment="center",
                         verticalalignment="center", 
-                        transform=axes_dict[(r,c)].transAxes,
+                        transform=axes_dict[(r, c)].transAxes,
                         rotation=0.,
                         rotation_mode="anchor",
                         color=label_color,
@@ -77,7 +77,7 @@ def custom_tile_image_plot(
                     plt.text(0.1, 0.1, str(labels[index]), 
                         horizontalalignment="center",
                         verticalalignment="center", 
-                        transform=axes_dict[(r,c)].transAxes,
+                        transform=axes_dict[(r, c)].transAxes,
                         rotation=0.,
                         rotation_mode="anchor",
                         color=label_color[(r*layout[1]+c)],
@@ -88,7 +88,7 @@ def custom_tile_image_plot(
                     plt.text(0.1, 0.1, str(labels[index]), 
                         horizontalalignment="center",
                         verticalalignment="center", 
-                        transform=axes_dict[(r,c)].transAxes,
+                        transform=axes_dict[(r, c)].transAxes,
                         rotation=0.,
                         rotation_mode="anchor",
                         color="green",
@@ -97,15 +97,17 @@ def custom_tile_image_plot(
             #
             image = images[(r*layout[1]+c),:]
             if(len(image.shape) == 2):
-                axes_dict[(r,c)].imshow(image, origin="upper", cmap=cmap)
-            elif(image.shape[-1] == 3):
-                axes_dict[(r,c)].imshow(image, origin="upper")
+                axes_dict[(r, c)].imshow(image, origin="upper", cmap=cmap)
+            elif(len(image.shape) == 3 and image.shape[-1] == 1):
+                axes_dict[(r, c)].imshow(image[:, :, 0], origin="upper", cmap=cmap)
+            elif(len(image.shape) == 3 and image.shape[-1] == 3):
+                axes_dict[(r, c)].imshow(image, origin="upper")
             else:
                 raise ValueError(
                     f"Expected either a grayscale (2D) or RGB image!\n{image.shape}")
 
     #
-    if( filename!="" ):
+    if(filename != ""):
         plt.savefig(filename, dpi=100, bbox_inches="tight")
     else:
         plt.show()
@@ -117,24 +119,26 @@ def custom_tile_plot_with_inference_hists(
     labels,
     predictions,
     classes=np.linspace(start=0,stop=10,num=10,endpoint=False,dtype=np.uint8),
-    only_mispredicted=False,
+    only_misclassified=False,
     filename="", 
     cmap="gray", 
-    label_size=32
+    label_size=32,
+    figure_size=(8., 8.)
 ):
     """
     Show multiple images AND their class probabilities as subplots.
     
     Args:
         layout (tuple): Tuple of integers (m,n).
-        data (np.array): NumPy array containing the images.
+        images (np.array): NumPy array containing the images.
         labels (np.array): A list or NumPy array of labels.
         predictions (np.array): Contains the inference class probabilities.
         classes (np.array): NumPy array of classes (optional -- default is [0..10])
-        only_mispredicted (bool): If True, will skip correctly predicted ones.
+        only_misclassified (bool): If True, will skip correctly predicted ones.
         filename (str): Filename to save the plot to as PNG (optional).
         cmap (str): Color map name (default is "gray"). 
         label_size (int): Font size of the labels.
+        figure_size (tuple): Figure size.
     
     Returns:
         None
@@ -147,11 +151,12 @@ def custom_tile_plot_with_inference_hists(
     realtive_image_bar_axes_size = 0.32
     #
     ## Identify misclassified ones if specified:
-    if( only_mispredicted ):
+    if(only_misclassified):
         images_      = np.copy(images)
         predictions_ = np.copy(predictions)
         labels_      = np.copy(labels)
-        mispred_indices = np.where( np.argmax(predictions_,axis=1)==labels_, False, True)
+        mispred_indices = np.where(
+            np.argmax(predictions_,axis=1)==labels_, False, True)
         images_      = images_[mispred_indices]
         labels_      = labels_[mispred_indices]
         predictions_ = predictions_[mispred_indices]
@@ -161,13 +166,13 @@ def custom_tile_plot_with_inference_hists(
         predictions_ = predictions
     #
     ## Cell/Tile width and height
-    width  = (1.-left_margine)/(horizontal_spacing_fraction*(layout[0]-1)+layout[0])  ## Width of a cell containing two plots
-    height = (1.-bottom_margin)/(vertical_spacing_fraction*(layout[1]-1)+layout[1])   ## Height of a cell containing two plots
+    width  = (1.-left_margine)/(horizontal_spacing_fraction*(layout[0]-1)+layout[0])  # Width of a cell containing two plots
+    height = (1.-bottom_margin)/(vertical_spacing_fraction*(layout[1]-1)+layout[1])  # Height of a cell containing two plots
     #
     ## Width and height for `imshow` and bar(h) plots:
-    if( width>=height ):
+    if(width >= height):
         horizontal_layout = True
-        if( width-height>=realtive_image_bar_axes_size*width ):
+        if((width - height) >= (realtive_image_bar_axes_size * width)):
             image_width  = height
             image_height = height
             image_bottom_delta = 0.
@@ -188,9 +193,9 @@ def custom_tile_plot_with_inference_hists(
             bar_height = height-delta_
             bar_bottom_delta = .5*(height-delta_)
             bar_left_delta   = 0.
-    elif( width<height ):
+    elif(width < height):
         horizontal_layout = False
-        if( height-width>=realtive_image_bar_axes_size*height ):
+        if((height - width) >= (realtive_image_bar_axes_size * height)):
             image_width  = width
             image_height = width
             image_bottom_delta = (height-width)
@@ -213,74 +218,85 @@ def custom_tile_plot_with_inference_hists(
             bar_left_delta   = .5*(width-delta_) 
     #
     ## Set figure size properly:
-    fig_width  = 10. ## inches
-    fig_height = 10. ## inches
-    plt.figure( figsize=(fig_width,fig_height) )
+    plt.figure(figsize=figure_size)
     #
     image_axes_dict = {}
     bar_axes_dict   = {}
     for r in range(0,layout[1]):
         for c in range(0,layout[0]):
             index = (r*layout[1]+c)  
-            highest_prob_label = np.where( predictions_[index,:]==np.amax(predictions_[index,:]) )                             
-            #
-            ## Image
-            cell_corner = ( left_margine  + c*(horizontal_spacing_fraction + 1.)*width,
-                            bottom_margin + r*(vertical_spacing_fraction   + 1.)*height )
-            image_axis_coord = [ image_left_delta   + cell_corner[0], 
-                                 image_bottom_delta + cell_corner[1],  
-                                 image_width, 
-                                 image_height ]
-            image_axes_dict[(r,c)] = plt.axes(image_axis_coord)
-            image_axes_dict[(r,c)].set_aspect("equal")
-            image_axes_dict[(r,c)].get_xaxis().set_visible(False)  ## Hide x axis
-            image_axes_dict[(r,c)].get_yaxis().set_visible(False)  ## Hide y axis
-            image_axes_dict[(r,c)].imshow( images_[index,:], origin="upper", cmap=cmap)
-            #
-            ## Prediction
+            highest_prob_label = np.where(
+                predictions_[index,:]==np.amax(predictions_[index,:]))                             
+            # Image
+            cell_corner = (
+                left_margine + c * (horizontal_spacing_fraction + 1.) * width,
+                bottom_margin + r * (vertical_spacing_fraction + 1.) * height
+            )
+            image_axis_coord = [ 
+                image_left_delta + cell_corner[0], 
+                image_bottom_delta + cell_corner[1],
+                image_width,
+                image_height
+            ]
+            image_axes_dict[(r, c)] = plt.axes(image_axis_coord)
+            image_axes_dict[(r, c)].set_aspect("equal")
+            image_axes_dict[(r, c)].get_xaxis().set_visible(False)  ## Hide x axis
+            image_axes_dict[(r, c)].get_yaxis().set_visible(False)  ## Hide y axis
+            # image_axes_dict[(r, c)].imshow(images_[index,:], origin="upper", cmap=cmap)
+            image = images_[index, :]
+            if(len(image.shape) == 2):
+                image_axes_dict[(r, c)].imshow(image, origin="upper", cmap=cmap)
+            elif(len(image.shape) == 3 and image.shape[-1] == 1):
+                image_axes_dict[(r, c)].imshow(image[:, :, 0], origin="upper", cmap=cmap)
+            elif(len(image.shape) == 3 and image.shape[-1] == 3):
+                image_axes_dict[(r, c)].imshow(image, origin="upper")
+            else:
+                raise ValueError(
+                    f"Expected either a grayscale (2D) or RGB image!\n{image.shape}")
+            # Prediction
             bar_axis_coord = [ bar_left_delta   + cell_corner[0], 
                                bar_bottom_delta + cell_corner[1],  
                                bar_width, 
                                bar_height ] 
-            bar_axes_dict[(r,c)] = plt.axes(bar_axis_coord)
-            bar_axes_dict[(r,c)].set_aspect("auto") 
-            if( horizontal_layout ):
-                bar_axes_dict[(r,c)].set_xticks(np.arange(0,1.1,step=.25))
-                bar_axes_dict[(r,c)].tick_params(axis="x", labelsize=6., labelrotation=90)
-                bar_axes_dict[(r,c)].set_yticks(classes)
-                bar_axes_dict[(r,c)].tick_params(axis="y", labelsize=6., labelrotation=0)
-                if( highest_prob_label == labels_[index] ):
-                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color="b")
-                    bar_axes_dict[(r,c)].set_facecolor((.9, .9, 1.))
+            bar_axes_dict[(r, c)] = plt.axes(bar_axis_coord)
+            bar_axes_dict[(r, c)].set_aspect("auto") 
+            if(horizontal_layout):
+                bar_axes_dict[(r, c)].set_xticks(np.arange(0,1.1,step=.25))
+                bar_axes_dict[(r, c)].tick_params(axis="x", labelsize=6., labelrotation=90)
+                bar_axes_dict[(r, c)].set_yticks(classes)
+                bar_axes_dict[(r, c)].tick_params(axis="y", labelsize=6., labelrotation=0)
+                if(highest_prob_label == labels_[index]):
+                    bar_axes_dict[(r, c)].barh(classes, predictions_[index,:], color="b")
+                    bar_axes_dict[(r, c)].set_facecolor((.9, .9, 1.))
                 else:
-                    bar_axes_dict[(r,c)].barh( classes, predictions_[index,:], color="r")
-                    bar_axes_dict[(r,c)].set_facecolor((1., .9, .9))
+                    bar_axes_dict[(r, c)].barh(classes, predictions_[index,:], color="r")
+                    bar_axes_dict[(r, c)].set_facecolor((1., .9, .9))
             else:
-                bar_axes_dict[(r,c)].set_yticks(np.arange(0,1.1,step=.25))
-                bar_axes_dict[(r,c)].tick_params(axis="y", labelsize=6., labelrotation=0)
-                bar_axes_dict[(r,c)].set_xticks(classes)
-                bar_axes_dict[(r,c)].tick_params(axis="x", labelsize=6., labelrotation=90)
-                if( highest_prob_label == labels_[index] ):
-                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color="b")
-                    bar_axes_dict[(r,c)].set_facecolor((.9, .9, 1.))
+                bar_axes_dict[(r, c)].set_yticks(np.arange(0,1.1,step=.25))
+                bar_axes_dict[(r, c)].tick_params(axis="y", labelsize=6., labelrotation=0)
+                bar_axes_dict[(r, c)].set_xticks(classes)
+                bar_axes_dict[(r, c)].tick_params(axis="x", labelsize=6., labelrotation=90)
+                if(highest_prob_label == labels_[index]):
+                    bar_axes_dict[(r, c)].bar(classes, predictions_[index,:], color="b")
+                    bar_axes_dict[(r, c)].set_facecolor((.9, .9, 1.))
                 else:
-                    bar_axes_dict[(r,c)].bar( classes, predictions_[index,:], color="r")
-                    bar_axes_dict[(r,c)].set_facecolor((1., .9, .9))
+                    bar_axes_dict[(r, c)].bar(classes, predictions_[index,:], color="r")
+                    bar_axes_dict[(r, c)].set_facecolor((1., .9, .9))
             #
-            if( c!=0 ):
-                bar_axes_dict[(r,c)].get_yaxis().set_visible(False)
-            if( r!=0 ):
-                bar_axes_dict[(r,c)].get_xaxis().set_visible(False)
+            if(c != 0):
+                bar_axes_dict[(r, c)].get_yaxis().set_visible(False)
+            if(r != 0):
+                bar_axes_dict[(r, c)].get_xaxis().set_visible(False)
             #
-            bar_axes_dict[(r,c)].text(.5, .5, str(labels_[index]),
-                transform=bar_axes_dict[(r,c)].transAxes,
+            bar_axes_dict[(r, c)].text(.5, .5, str(labels_[index]),
+                transform=bar_axes_dict[(r, c)].transAxes,
                 verticalalignment="center", 
                 horizontalalignment="center",
                 color="black",
                 alpha=.5,
                 fontsize=label_size)
     #
-    if( filename!="" ):
+    if(filename != ""):
         plt.savefig(filename, dpi=100, bbox_inches="tight")
     else:
         plt.show()
