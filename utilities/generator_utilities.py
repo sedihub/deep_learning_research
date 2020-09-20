@@ -28,10 +28,9 @@ class ScrambledImageDataGenerator(tf.keras.utils.Sequence):
             self.scrambler = None
         assert(self.features.shape[0] == self.labels.shape[0])
         self.dataset_length = self.labels.shape[0]
-        if( normalize ):
-            ## Normalizing images one by one!
-            normalization_array = 1.0 / np.amax(self.features, axis=(1,2))
-            self.features = self.features * normalization_array[:,np.newaxis,np.newaxis]
+        #
+        if(normalize):
+            self.features = self.features / 128. - 1.0
 
     def __len__(self):
         return self.dataset_length // self.batch_size
