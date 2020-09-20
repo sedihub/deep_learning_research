@@ -44,6 +44,10 @@ class ScrambledImageDataGenerator(tf.keras.utils.Sequence):
                 for n in range(self.batch_size):
                     flatten_array = features[n, :, :].flatten()[self.scrambler]
                     features[n, :, :] = flatten_array.reshape(self.features.shape[1:])
+            elif(features.shape[-1] == 1):
+                for n in range(self.batch_size):
+                    flatten_array = features[n, :, :, 0].flatten()[self.scrambler]
+                    features[n, :, :, 0] = flatten_array.reshape(self.features.shape[1:-1])
             elif(features.shape[-1] == 3):
                 for n in range(self.batch_size):
                     flatten_array = features[n, :, :, 0].flatten()[self.scrambler]
