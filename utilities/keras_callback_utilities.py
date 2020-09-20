@@ -1,6 +1,8 @@
 """A collection of callbacks
 """
 
+import tensorflow as tf
+
 class CustomHistory(tf.keras.callbacks.Callback):
     """A custom callback to monitor model training.
     """
