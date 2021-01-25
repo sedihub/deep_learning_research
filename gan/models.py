@@ -293,8 +293,8 @@ class Train_GAN_Modules:
             disc_gen_image_pred = self.discriminator_model(gen_image)
             #
             real_image_disc_loss = self.loss_func(
-                    y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
-                    y_pred=disc_real_image_pred)
+                y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
+                y_pred=disc_real_image_pred)
             gen_image_disc_loss = self.loss_func(
                 y_true=tf.zeros(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_gen_image_pred)
