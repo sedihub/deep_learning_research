@@ -296,10 +296,10 @@ class Train_GAN_Modules:
                     y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
                     y_pred=disc_real_image_pred)
             gen_image_disc_loss = self.loss_func(
-                y_true=tf.zeros(shape=(batch_size,), dtype=tf.int32),
+                y_true=tf.zeros(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_gen_image_pred)
             gen_image_gen_loss = self.loss_func(
-                y_true=tf.ones(shape=(batch_size,), dtype=tf.int32),
+                y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_gen_image_pred)
 
         # Get gradients:
@@ -341,5 +341,5 @@ class Train_GAN_Modules:
             float(real_image_disc_loss.numpy()), 
             float(gen_image_disc_loss.numpy()), 
             float(gen_image_gen_loss.numpy()))
-        self._accumulate_losses(losses)
+        self._accumulate_losses(*losses)
         return losses
