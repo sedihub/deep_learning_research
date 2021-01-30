@@ -252,74 +252,59 @@ class Train_GAN_Modules:
         self.batch_size = batch_size
         
         self._accumulated_losses = {
-            "Discriminator Loss on Real Image": 0.0,
-            "Discriminator Loss on Generated Image": 0.0,
-            "Generator Deception Loss": 0.0} 
+            "Discriminator Loss": 0.0,
+            "Generator Loss": 0.0} 
         self._counter = 0
         
-    def _accumulate_losses(self, l1, l2, l3):
+    def _accumulate_losses(self, l1, l2):
         self._counter += 1
-        self._accumulated_losses["Discriminator Loss on Real Image"] += l1
-        self._accumulated_losses["Discriminator Loss on Generated Image"] += l2
-        self._accumulated_losses["Generator Deception Loss"] += l3
+        self._accumulated_losses["Discriminator Loss"] += l1
+        self._accumulated_losses["Generator Loss"] += l2
     
     def reset_accumulated_losses(self,):
         for key in self._accumulated_losses:
-            self._accumulated_losses[key] = 0.0  
-        self._counter = 0
-        
+            self._accumulated_losses[key] = 0.0
+        self._counter = 0.0
+    
     def get_accumulated_losses(self):
         for key in self._accumulated_losses:
             self._accumulated_losses[key] /= self._counter
         return self._accumulated_losses
         
-    def train_step(
+    @tf.function
+    def _train_step(
         self,
         discriminator_input, 
         generator_input,):
-        """Training step function.
-
-        Args:
-            discriminator_input: Input to the discriminator model.
-            generator_input: Input to the generator model.
-
-        Returns:
-            None
-        """
         # Forward pass:
         with tf.GradientTape(persistent=True) as tape:
-            disc_real_image_pred = self.discriminator_model(discriminator_input)
-            gen_image = self.generator_model(generator_input)
-            disc_gen_image_pred = self.discriminator_model(gen_image)
+            disc_real_image_pred = self.discriminator_model(discriminator_input, training=True)
+            gen_image = self.generator_model(generator_input, training=True)
+            disc_gen_image_pred = self.discriminator_model(gen_image, training=True)
             #
-            real_image_disc_loss = self.loss_func(
+            disc_loss_on_real = self.loss_func(
                 y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_real_image_pred)
-            gen_image_disc_loss = self.loss_func(
+            disc_loss_on_gen = self.loss_func(
                 y_true=tf.zeros(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_gen_image_pred)
-            gen_image_gen_loss = self.loss_func(
+            disc_loss = 0.5 * (disc_loss_on_real + disc_loss_on_gen)
+            gen_loss = self.loss_func(
                 y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
                 y_pred=disc_gen_image_pred)
+        # tf.print("disc_loss_on_real: ", disc_loss_on_real)
+        # tf.print("disc_loss_on_gen: ", disc_loss_on_gen)
+        # tf.print("gen_loss: ", gen_loss, "\n")
 
         # Get gradients:
-        disc_gradients_1 = tape.gradient(
-            target=real_image_disc_loss, 
+        disc_gradients = tape.gradient(
+            target=disc_loss, 
             sources=self.discriminator_model.trainable_variables, 
             output_gradients=None,
             unconnected_gradients=tf.UnconnectedGradients.ZERO)
-        disc_gradients_2 = tape.gradient(
-            target=gen_image_disc_loss, 
-            sources=self.discriminator_model.trainable_variables, 
-            output_gradients=None,
-            unconnected_gradients=tf.UnconnectedGradients.ZERO)
-        disc_gradients = []
-        for g_1, g_2 in zip(disc_gradients_1, disc_gradients_2):
-            disc_gradients.append(
-                0.5 * (g_1 + g_2))
         #
         gen_gradients = tape.gradient(
-            target=gen_image_gen_loss, 
+            target=gen_loss, 
             sources=self.generator_model.trainable_variables, 
             output_gradients=None,
             unconnected_gradients=tf.UnconnectedGradients.ZERO)
@@ -337,9 +322,22 @@ class Train_GAN_Modules:
         self.optimizer.apply_gradients(
             zip(all_gradients, all_trainable_variables))
         
-        losses = (
-            float(real_image_disc_loss.numpy()), 
-            float(gen_image_disc_loss.numpy()), 
-            float(gen_image_gen_loss.numpy()))
+        return (disc_loss, gen_loss)
+
+    def train_step(
+        self,
+        discriminator_input, 
+        generator_input,):
+        """Training step function.
+
+        Args:
+            discriminator_input: Input to the discriminator model.
+            generator_input: Input to the generator model.
+
+        Returns:
+            None
+        """        
+        losses = self._train_step(discriminator_input, generator_input)
+        losses = tuple([float(x.numpy()) for x in losses])
         self._accumulate_losses(*losses)
         return losses
