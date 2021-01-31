@@ -25,11 +25,11 @@ But, not surprisingly, the adversarial attack is completely ineffective on other
 
 |   Architecture   |       Predicted Class Name           | Pred. Idx |  Confidence |
 | ---------------- | ------------------------------------ | --------- | ----------- |
-|Resnet50          |  megalith, megalithic structure      |    649    |    0.780    |
-|Efficientnetb0    |  king penguin, Aptenodytes patagonica|    145    |    0.924    |
-|Densenet201       |  king penguin, Aptenodytes patagonica|    145    |    0.994    |
-|Mobilenetv2       |  king penguin, Aptenodytes patagonica|    145    |    0.958    |
-|Nasnetmobile      |  king penguin, Aptenodytes patagonica|    145    |    0.904    |
+|Resnet-50         |  megalith, megalithic structure      |    649    |    0.780    |
+|Efficientnet-B0   |  king penguin, Aptenodytes patagonica|    145    |    0.924    |
+|DenseNet-201      |  king penguin, Aptenodytes patagonica|    145    |    0.994    |
+|MobileNet-V2      |  king penguin, Aptenodytes patagonica|    145    |    0.958    |
+|NasNetMobile      |  king penguin, Aptenodytes patagonica|    145    |    0.904    |
 
 We will also see that passing the image through a low-pass filter is an effective way of countering adversarial attacks. 
 
