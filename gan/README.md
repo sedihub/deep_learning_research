@@ -38,18 +38,18 @@ To see what our generator model can do, we first train it in a supervised settin
 
 Training the generator this way (with only the labels and the mean pixel value as input to the generator), we get:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/emulating_mnist_histogram.png?raw=true) 
+![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/supervised_learning_genrative_model.png?raw=true) 
 
 Finally, let's see what happens if we feed in different average pixel values to the generator model:
 
 <p align="center">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png" alt="Sampling histogram of MNIST images" width="80%" height="80%">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png" alt="The effect of mean pixel value on the generated images" width="80%" height="80%">
 </p>
 
 We can play with the labels, too. I was really hoping to see 3 and 8 looking the same similar to what is seen in knowledge distillation (see [Hinton's paper](https://arxiv.org/abs/1503.02531)). Nonetheless, we can see how in the case with input of 5 and 0, the generator tries to have a combination of both:
 
 <p align="center">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png" alt="Sampling histogram of MNIST images" width="80%" height="80%">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png" alt="Mixing up labels as hidden representation" width="80%" height="80%">
 </p>
 
 Note that when we train the generator in the GAN setting, being an unsupervised learning situation, we cannot make the same assumptions about the number of inputs of the model. As we will see in the next section, there I set the input size to 32 and relied on uniform normal input. 
