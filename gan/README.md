@@ -23,9 +23,10 @@ The way this is done, as shown below, is the same as the way any one-dimensional
 
 The set of images below show sampled instances (fake images) based on the histogram of the MNIST images versus some real images. As mentioned earlier, the make the task of classification a bit more difficult for the discriminator we scramble the images (the right-hand-side set).  
 
+
 <p float="left">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png" alt="Original fake and real images" width="50" height="50">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png" alt="Scrambled fake and real images" width="50" height="50">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png" alt="Original fake and real images" width="50%" height="50%">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png" alt="Scrambled fake and real images" width="50%" height="50%">
 </p>
  
 The effect of scrambling input image on CNN images was explored in an earlier exploration. The short version is that this forces the discriminator to rely on features learned deeper into the network as the feature maps in the initial layers lack features that allow the discriminator to distinguish fake from real images.
@@ -43,7 +44,7 @@ Finally, let's see what happens if we feed in different average pixel values to 
 
 ![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png?raw=true) 
 
-We can play with the labels, too. I was really hoping to see 3 and 8 looking the same similar to what is seen in knowledge distillation (see [Hinton's paper](https://arxiv.org/abs/1503.02531)):
+We can play with the labels, too. I was really hoping to see 3 and 8 looking the same similar to what is seen in knowledge distillation (see [Hinton's paper](https://arxiv.org/abs/1503.02531)). Nonetheless, we can see how in the case with input of 5 and 0, the generator tries to have a combination of both:
 
 ![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png?raw=true) 
 
