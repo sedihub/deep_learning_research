@@ -38,7 +38,9 @@ To see what our generator model can do, we first train it in a supervised settin
 
 Training the generator this way (with only the labels and the mean pixel value as input to the generator), we get:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/supervised_learning_genrative_model.png?raw=true) 
+<p align="center">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/supervised_learning_genrative_model.png" alt="Sampling histogram of MNIST images" width="80%" height="80%">
+</p>
 
 Finally, let's see what happens if we feed in different average pixel values to the generator model:
 
