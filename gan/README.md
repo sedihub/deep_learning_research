@@ -42,11 +42,15 @@ Training the generator this way (with only the labels and the mean pixel value a
 
 Finally, let's see what happens if we feed in different average pixel values to the generator model:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png?raw=true) 
+<p align="center">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png" alt="Sampling histogram of MNIST images" width="80%" height="80%">
+</p>
 
 We can play with the labels, too. I was really hoping to see 3 and 8 looking the same similar to what is seen in knowledge distillation (see [Hinton's paper](https://arxiv.org/abs/1503.02531)). Nonetheless, we can see how in the case with input of 5 and 0, the generator tries to have a combination of both:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png?raw=true) 
+<p align="center">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png" alt="Sampling histogram of MNIST images" width="80%" height="80%">
+</p>
 
 Note that when we train the generator in the GAN setting, being an unsupervised learning situation, we cannot make the same assumptions about the number of inputs of the model. As we will see in the next section, there I set the input size to 32 and relied on uniform normal input. 
 
