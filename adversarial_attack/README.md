@@ -23,13 +23,13 @@ But, not surprisingly, the adversarial attack is completely ineffective on other
     <img src="https://github.com/sedihub/deep_learning_research/blob/master/adversarial_attack/.images/other_architectures.png" alt="Adversarial attack is ineeffective on other architectures" width="80%" height="80%">
 </p>
 
-    | Architecture     |        Prediction Name [Pred. Index]        |  Confidence |
-    |:----------------:|:-------------------------------------------:|:-----------:|
-    |Resnet50          |  megalith, megalithic structure       [649] |    0.780    |
-    |Efficientnetb0    |  king penguin, Aptenodytes patagonica [145] |    0.924    |
-    |Densenet201       |  king penguin, Aptenodytes patagonica [145] |    0.994    |
-    |Mobilenetv2       |  king penguin, Aptenodytes patagonica [145] |    0.958    |
-    |Nasnetmobile      |  king penguin, Aptenodytes patagonica [145] |    0.904    |
+    | Architecture     |        Prediction Name               |   Idx |  Confidence |
+    | ---------------- | ------------------------------------ | ----- | ----------- |
+    |Resnet50          |  megalith, megalithic structure      |  649  |    0.780    |
+    |Efficientnetb0    |  king penguin, Aptenodytes patagonica|  145  |    0.924    |
+    |Densenet201       |  king penguin, Aptenodytes patagonica|  145  |    0.994    |
+    |Mobilenetv2       |  king penguin, Aptenodytes patagonica|  145  |    0.958    |
+    |Nasnetmobile      |  king penguin, Aptenodytes patagonica|  145  |    0.904    |
 
 We will also see that passing the image through a low-pass filter is an effective way of countering adversarial attacks. 
 
