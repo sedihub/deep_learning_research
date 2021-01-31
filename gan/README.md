@@ -15,15 +15,15 @@ To set the stage, we first focus on developing and training discriminator and ge
 
 To train the discriminator model (at least partially), we feed in scrambled real images (to make things a bit more difficult for the model) and along with random instances drawn from a probability distribution that has the same histogram as the real images:
 
-![Histograms of fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imageshistigrams_of_mnist_and_fake.png?raw=true) 
+![Histograms of fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/histigrams_of_mnist_and_fake.png?raw=true) 
 
 The way this is done, as shown below, is the same as the way any one-dimensional distribution is sampled: Compile the cumulative distribution, invert it, and finally sample it using a uniform distribution. Not that this simple-minded approach completely ignores any correlations between the pixel locations and intensities.
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagesemulating_mnist_histogram.png?raw=true) 
+![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/emulating_mnist_histogram.png?raw=true) 
 
 The set of images below show sampled instances (fake images) based on the histogram of the MNIST images versus some real images. As mentioned earlier, the make the task of classification a bit more difficult for the discriminator we scramble the images (the right-hand-side set).  
 
-![Original fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagesmnist_and_fake.png?raw=true)  ![Scrambled fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagesscrambled_mnist_and_fake.png?raw=true)  
+![Original fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png?raw=true)  ![Scrambled fake and real images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png?raw=true)  
  
 The effect of scrambling input image on CNN images was explored in an earlier exploration. The short version is that this forces the discriminator to rely on features learned deeper into the network as the feature maps in the initial layers lack features that allow the discriminator to distinguish fake from real images.
 
@@ -34,15 +34,15 @@ To see what our generator model can do, we first train it in a supervised settin
 
 Training the generator this way (with only the labels and the mean pixel value as input to the generator), we get:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagesemulating_mnist_histogram.png?raw=true) 
+![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/emulating_mnist_histogram.png?raw=true) 
 
 Finally, let's see what happens if we feed in different average pixel values to the generator model:
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagesgenerated_images_with_image_pixel_means.png?raw=true) 
+![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/generated_images_with_image_pixel_means.png?raw=true) 
 
 We can play with the labels, too. I was really hoping to see 3 and 8 looking the same similar to what is seen in knowledge distillation (see [Hinton's paper](https://arxiv.org/abs/1503.02531)):
 
-![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.imagescombined_hidden_representation.png?raw=true) 
+![Sampling histogram of MNIST images](https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/combined_hidden_representation.png?raw=true) 
 
 Note that when we train the generator in the GAN setting, being an unsupervised learning situation, we cannot make the same assumptions about the number of inputs of the model. As we will see in the next section, there I set the input size to 32 and relied on uniform normal input. 
 
