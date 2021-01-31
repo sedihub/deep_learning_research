@@ -25,8 +25,8 @@ The set of images below show sampled instances (fake images) based on the histog
 
 
 <p float="left">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png" alt="Original fake and real images" width="50%" height="50%">
-    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png" alt="Scrambled fake and real images" width="50%" height="50%">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png" alt="Original fake and real images" width="40%" height="40%">
+    <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png" alt="Scrambled fake and real images" width="40%" height="40%">
 </p>
  
 The effect of scrambling input image on CNN images was explored in an earlier exploration. The short version is that this forces the discriminator to rely on features learned deeper into the network as the feature maps in the initial layers lack features that allow the discriminator to distinguish fake from real images.
