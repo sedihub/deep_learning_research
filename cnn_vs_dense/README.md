@@ -1,3 +1,5 @@
+**T.B.D.: Clean up the contents...**
+
 # CNN vs. Dense
 
 CNNs have revolutionized deep computer vision. One of the reasons for this is transfer learning. The idea behind transfer learning in the context of CNNs is that low-lever features extracted are useful/common across many tasks. The intuitive justification for this is that images share boundaries between regions. 
