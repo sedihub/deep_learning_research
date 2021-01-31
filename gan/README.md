@@ -24,7 +24,7 @@ The way this is done, as shown below, is the same as the way any one-dimensional
 The set of images below show sampled instances (fake images) based on the histogram of the MNIST images versus some real images. As mentioned earlier, the make the task of classification a bit more difficult for the discriminator we scramble the images (the right-hand-side set).  
 
 
-<p float="center">
+<p align="center">
     <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/mnist_and_fake.png" alt="Original fake and real images" width="45%" height="45%">
     <img src="https://github.com/sedihub/deep_learning_research/blob/master/gan/.images/scrambled_mnist_and_fake.png" alt="Scrambled fake and real images" width="45%" height="45%">
 </p>
