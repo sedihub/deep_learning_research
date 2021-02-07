@@ -111,9 +111,8 @@ def construct_generator_model(
     """
     inputs = tf.keras.Input(shape=(input_size,), dtype=tf.float32)
     #    
-    x = inputs 
     x = tf.keras.layers.Dense(
-        units=256 * 16, 
+        units=128, 
         activation=None,  
         use_bias=True,
         kernel_initializer="glorot_uniform",
@@ -128,6 +127,23 @@ def construct_generator_model(
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
         name="leaky_relu_1"
+    )(x)   
+    x = tf.keras.layers.Dense(
+        units=256 * 16, 
+        activation=None,  
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros", 
+        kernel_regularizer=None,
+        bias_regularizer=None, 
+        activity_regularizer=None, 
+        kernel_constraint=None,
+        bias_constraint=None,
+        name="dense_2"
+    )(x)
+    x = tf.keras.layers.LeakyReLU(
+        alpha=0.2,
+        name="leaky_relu_2"
     )(x)
     x = tf.keras.layers.Reshape(
         target_shape=(4, 4, 256),
@@ -157,7 +173,7 @@ def construct_generator_model(
         )(x)
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
-        name="leaky_relu_2"
+        name="leaky_relu_3"
     )(x)
     x = tf.keras.layers.Conv2DTranspose(
         filters=64, 
@@ -184,7 +200,7 @@ def construct_generator_model(
         )(x)
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
-        name="leaky_relu_3"
+        name="leaky_relu_4"
     )(x)
     x =  tf.keras.layers.Conv2DTranspose(
         filters=1, 
