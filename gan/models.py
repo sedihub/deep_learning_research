@@ -5,7 +5,7 @@ models.
 import tensorflow as tf
 
 
-def construct_discriminator_model():
+def construct_discriminator_model(activation="relu", output_softmax=True):
     """Constructs and returns a discriminator model.
     """
     inputs = tf.keras.Input(shape=(28, 28, 1), dtype=tf.float32)
@@ -18,7 +18,7 @@ def construct_discriminator_model():
         data_format="channels_last", 
         dilation_rate=(1, 1), 
         groups=1,
-        activation=tf.keras.activations.relu,
+        activation=None,
         use_bias=True,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros", 
@@ -29,6 +29,17 @@ def construct_discriminator_model():
         bias_constraint=None,
         name="conv_1"
     )(inputs)
+    if activation == "relu":
+        x = tf.keras.layers.ReLU(
+            name="relu_1"
+        )(x)
+    elif activation == "leakyrelu":  
+        x = tf.keras.layers.LeakyReLU(
+            alpha=0.2,
+            name="leaky_relu_1"
+        )(x)
+    else:
+        raise ValueError(f"\"{activation}\" is not a valid activation!") 
     x = tf.keras.layers.Conv2D(
         filters=32, 
         kernel_size=(5, 5), 
@@ -37,7 +48,7 @@ def construct_discriminator_model():
         data_format="channels_last", 
         dilation_rate=(1, 1), 
         groups=1,
-        activation=tf.keras.activations.relu,
+        activation=None,
         use_bias=True,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros", 
@@ -48,10 +59,21 @@ def construct_discriminator_model():
         bias_constraint=None,
         name="conv_2"
     )(x)
+    if activation == "relu":
+        x = tf.keras.layers.ReLU(
+            name="relu_2"
+        )(x)
+    elif activation == "leakyrelu": 
+        x = tf.keras.layers.LeakyReLU(
+            alpha=0.2,
+            name="leaky_relu_2"
+        )(x)
+    else:
+        raise ValueError(f"\"{activation}\" is not a valid activation!") 
     x = tf.keras.layers.Flatten(name="flatten")(x) 
-    outputs = tf.keras.layers.Dense(
+    x = tf.keras.layers.Dense(
         units=2, 
-        activation=tf.keras.activations.softmax, 
+        activation=None, 
         use_bias=True,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros", 
@@ -62,6 +84,13 @@ def construct_discriminator_model():
         bias_constraint=None,
         name="output"
     )(x)
+    if output_softmax:
+        outputs = tf.keras.layers.LeakyReLU(
+            axis=-1,
+            name="softmax"
+        )(x)
+    else:
+        outputs = x
     #
     return tf.keras.Model(
         inputs=inputs, 
@@ -71,7 +100,7 @@ def construct_discriminator_model():
 
 def construct_generator_model(
     input_size=10, 
-    output_activation="sigmoid",
+    output_activation="linear",
     with_batchnorm=True):
     """Constructs and returns a generator model.
     
@@ -82,23 +111,7 @@ def construct_generator_model(
     """
     inputs = tf.keras.Input(shape=(input_size,), dtype=tf.float32)
     #    
-    x = tf.keras.layers.Dense(
-        units=256, 
-        activation=None, 
-        use_bias=True,
-        kernel_initializer="glorot_uniform",
-        bias_initializer="zeros", 
-        kernel_regularizer=None,
-        bias_regularizer=None, 
-        activity_regularizer=None, 
-        kernel_constraint=None,
-        bias_constraint=None,
-        name="dense_1"
-    )(inputs)   
-    x = tf.keras.layers.LeakyReLU(
-        alpha=0.2,
-        name="leaky_relu_1"
-    )(x)
+    x = inputs 
     x = tf.keras.layers.Dense(
         units=256 * 16, 
         activation=None,  
@@ -110,11 +123,11 @@ def construct_generator_model(
         activity_regularizer=None, 
         kernel_constraint=None,
         bias_constraint=None,
-        name="dense_2"
-    )(x)
+        name="dense_1"
+    )(inputs)
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
-        name="leaky_relu_2"
+        name="leaky_relu_1"
     )(x)
     x = tf.keras.layers.Reshape(
         target_shape=(4, 4, 256),
@@ -144,7 +157,7 @@ def construct_generator_model(
         )(x)
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
-        name="leaky_relu_3"
+        name="leaky_relu_2"
     )(x)
     x = tf.keras.layers.Conv2DTranspose(
         filters=64, 
@@ -171,7 +184,7 @@ def construct_generator_model(
         )(x)
     x = tf.keras.layers.LeakyReLU(
         alpha=0.2,
-        name="leaky_relu_4"
+        name="leaky_relu_3"
     )(x)
     x =  tf.keras.layers.Conv2DTranspose(
         filters=1, 
@@ -222,7 +235,8 @@ class Train_GAN_Modules:
         generator_model,
         batch_size,
         loss_func=None,
-        optimizer=None,):
+        optimizer=None,
+        **kwargs):
         """Helper class for training GAN modules.
 
         Args:
@@ -233,12 +247,10 @@ class Train_GAN_Modules:
             optimizer: Optimizer.
         """
         if loss_func is None:
-            self.loss_func = tf.keras.losses.SparseCategoricalCrossentropy(
-                from_logits=False, 
-                reduction=tf.keras.losses.Reduction.SUM_OVER_BATCH_SIZE,
+            self.loss_func = tf.keras.losses.CategoricalCrossentropy(
+                from_logits=kwargs.get("from_logits", False),
+                reduction=tf.keras.losses.Reduction.SUM_OVER_BATCH_SIZE, 
                 name="cross_entropy")
-        else:
-            self.loss_func = loss_func
         
         if optimizer is None:
             self.optimizer = tf.keras.optimizers.SGD(
@@ -255,6 +267,11 @@ class Train_GAN_Modules:
             "Discriminator Loss": 0.0,
             "Generator Loss": 0.0} 
         self._counter = 0
+        
+        self._batch_of_ones = tf.one_hot(
+            tf.ones(shape=(self.batch_size,), dtype=tf.int32), 2)
+        self._batch_of_zeros = tf.one_hot(
+            tf.zeros(shape=(self.batch_size,), dtype=tf.int32), 2)
         
     def _accumulate_losses(self, l1, l2):
         self._counter += 1
@@ -275,7 +292,9 @@ class Train_GAN_Modules:
     def _train_step(
         self,
         discriminator_input, 
-        generator_input,):
+        generator_input,
+        _batch_of_ones,
+        _batch_of_zeros):
         # Forward pass:
         with tf.GradientTape(persistent=True) as tape:
             disc_real_image_pred = self.discriminator_model(discriminator_input, training=True)
@@ -283,18 +302,19 @@ class Train_GAN_Modules:
             disc_gen_image_pred = self.discriminator_model(gen_image, training=True)
             #
             disc_loss_on_real = self.loss_func(
-                y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
+                y_true=_batch_of_ones, 
                 y_pred=disc_real_image_pred)
             disc_loss_on_gen = self.loss_func(
-                y_true=tf.zeros(shape=(self.batch_size,), dtype=tf.int32),
+                y_true=_batch_of_zeros, 
                 y_pred=disc_gen_image_pred)
             disc_loss = 0.5 * (disc_loss_on_real + disc_loss_on_gen)
             gen_loss = self.loss_func(
-                y_true=tf.ones(shape=(self.batch_size,), dtype=tf.int32),
+                y_true=_batch_of_ones, 
                 y_pred=disc_gen_image_pred)
-        # tf.print("disc_loss_on_real: ", disc_loss_on_real)
-        # tf.print("disc_loss_on_gen: ", disc_loss_on_gen)
-        # tf.print("gen_loss: ", gen_loss, "\n")
+        # tf.print("\t disc_loss_on_real: ", disc_loss_on_real)
+        # tf.print("\t disc_loss_on_gen:  ", disc_loss_on_gen)
+        # tf.print("\t disc_loss:         ", disc_loss)
+        # tf.print("\t gen_loss:          ", gen_loss, "\n")
 
         # Get gradients:
         disc_gradients = tape.gradient(
@@ -309,7 +329,6 @@ class Train_GAN_Modules:
             output_gradients=None,
             unconnected_gradients=tf.UnconnectedGradients.ZERO)
         
-
         # Update variables:
         all_gradients = []
         all_gradients.extend(disc_gradients)
@@ -320,8 +339,8 @@ class Train_GAN_Modules:
         all_trainable_variables.extend(self.generator_model.trainable_variables)
         #
         self.optimizer.apply_gradients(
-            zip(all_gradients, all_trainable_variables))
-        
+           zip(all_gradients, all_trainable_variables))
+
         return (disc_loss, gen_loss)
 
     def train_step(
@@ -337,7 +356,11 @@ class Train_GAN_Modules:
         Returns:
             None
         """        
-        losses = self._train_step(discriminator_input, generator_input)
+        losses = self._train_step(
+            discriminator_input, 
+            generator_input,
+            self._batch_of_ones,
+            self._batch_of_zeros)
         losses = tuple([float(x.numpy()) for x in losses])
         self._accumulate_losses(*losses)
         return losses
